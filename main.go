@@ -32,6 +32,7 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
+// Get book with id 
 func getBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	param := mux.Vars(r)
@@ -44,6 +45,7 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(&Book{})
 }
 
+// Create new book
 func createBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var book Book
@@ -57,6 +59,8 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// init books
+	// @TODO: Using database 
 	books = append(books, Book{ID: "1", Isbn: "124864", Title: "book 1", Author: &Author{FirstName: "john", LastName: "steven"}})
 	books = append(books, Book{ID: "2", Isbn: "548618", Title: "book 2", Author: &Author{FirstName: "dave", LastName: "dao"}})
 	books = append(books, Book{ID: "3", Isbn: "355482", Title: "book 3", Author: &Author{FirstName: "sara", LastName: "ross"}})
@@ -64,7 +68,7 @@ func main() {
 	//init router
 	r := mux.NewRouter()
 
-	// Router Handlers
+	// Router Handlers (URLs)
 	r.HandleFunc("/api/books", getBooks).Methods("GET")
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/book", createBook).Methods("POST")
