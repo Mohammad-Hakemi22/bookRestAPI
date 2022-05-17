@@ -32,7 +32,7 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
-// Get book with id 
+// Get book with id
 func getBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	param := mux.Vars(r)
@@ -71,9 +71,29 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(books)
 }
 
+func updateBook(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	param := mux.Vars(r)
+	for index, item := range books {
+		if item.ID == param["id"] {
+			books = append(books[:index], books[index+1:]...)
+			var book Book
+			err := json.NewDecoder(r.Body).Decode(&book)
+			if err != nil {
+				log.Fatalln("something went wrong with decode json")
+			}
+			book.ID = param["id"]
+			books = append(books, book)
+			json.NewEncoder(w).Encode(book)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(books)
+}
+
 func main() {
 	// init books
-	// @TODO: Using database 
+	// @TODO: Using database
 	books = append(books, Book{ID: "1", Isbn: "124864", Title: "book 1", Author: &Author{FirstName: "john", LastName: "steven"}})
 	books = append(books, Book{ID: "2", Isbn: "548618", Title: "book 2", Author: &Author{FirstName: "dave", LastName: "dao"}})
 	books = append(books, Book{ID: "3", Isbn: "355482", Title: "book 3", Author: &Author{FirstName: "sara", LastName: "ross"}})
@@ -85,7 +105,7 @@ func main() {
 	r.HandleFunc("/api/books", getBooks).Methods("GET")
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/book", createBook).Methods("POST")
-	// r.HandleFunc("api/books/{id}", updateBook).Methods("PUT")
+	r.HandleFunc("/api/books/{id}", updateBook).Methods("PUT")
 	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
 
 	// Run Server on port :8000
