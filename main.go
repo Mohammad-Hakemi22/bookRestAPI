@@ -58,6 +58,19 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
+// Delete a book
+func deleteBook(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	param := mux.Vars(r)
+	for index, item := range books {
+		if item.ID == param["id"] {
+			books = append(books[:index], books[index+1:]...)
+			return
+		}
+	}
+	json.NewEncoder(w).Encode(books)
+}
+
 func main() {
 	// init books
 	// @TODO: Using database 
@@ -73,7 +86,7 @@ func main() {
 	r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
 	r.HandleFunc("/api/book", createBook).Methods("POST")
 	// r.HandleFunc("api/books/{id}", updateBook).Methods("PUT")
-	// r.HandleFunc("api/books/{id}", deleteBooks).Methods("DELETE")
+	r.HandleFunc("/api/books/{id}", deleteBook).Methods("DELETE")
 
 	// Run Server on port :8000
 	log.Fatal(http.ListenAndServe(":8000", r))
